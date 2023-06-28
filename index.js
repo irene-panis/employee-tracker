@@ -55,7 +55,7 @@ const ask = () => {
           console.log('Updating an employee role');
           break;
         default:
-          return;
+          process.exit();
       }
   });
 }
