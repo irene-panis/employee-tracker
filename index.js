@@ -55,7 +55,7 @@ const ask = () => {
           console.log('Updating an employee role');
           break;
         default:
-          break;
+          return;
       }
   });
 }
@@ -91,13 +91,21 @@ const viewEmployees = () => {
 }
 
 const addDepartment = () => {
-  inquirer.prompt('Please name a department to add.')
+  const question = [
+    {
+      type: 'input',
+      name: 'dept',
+      message: 'Please name a department to add.'
+    }
+  ]
+  inquirer.prompt(question)
     .then((input) => {
-      db.query(`INSERT INTO departments (name) VALUES (?)`, input, (err, result) => {
+      db.query(`INSERT INTO departments (name) VALUES (?)`, input.dept, (err, result) => {
         if (err) {
           console.log(err);
         }
-        console.table(result);
+        console.log(`Added ${input.dept} to the database. 🤖⚡️`);
+        ask();
       });
     });
 }
