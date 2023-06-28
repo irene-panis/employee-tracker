@@ -11,6 +11,7 @@ const db = mysql.createConnection(
   console.log('Connected to employees_db database. 👩🏼‍💻')
 )
 
+// list of options
 const options = [
   {
     type: 'list',
@@ -29,6 +30,7 @@ const options = [
   },
 ];
 
+// starts asking questions then runs funcs depending on option chosen
 const ask = () => {
   inquirer.prompt(options)
   .then((data) => {
@@ -55,21 +57,23 @@ const ask = () => {
           updateEmployee();
           break;
         default:
-          process.exit();
+          process.exit(); // quit option = terminates program
       }
   });
 }
 
+// displays departments
 const viewDepartments = () => {
   db.query(`SELECT * FROM departments`, (err, data) => {
     if (err) {
       console.log(err);
     }
     console.table(data);
-    ask();
+    ask(); // runs ask() again, do this after every function until we quit
   });
 }
 
+// displays roles complete with department name
 const viewRoles = () => {
   const query = `
     SELECT roles.id, roles.title, departments.name, roles.salary
@@ -85,6 +89,7 @@ const viewRoles = () => {
   });
 }
 
+// views employees and a bunch of info about their department and manager
 const viewEmployees = () => {
   const query = `
   SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name AS department, roles.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager
@@ -102,6 +107,7 @@ const viewEmployees = () => {
   });
 }
 
+// adds user input as new department to database
 const addDepartment = () => {
   const question = [
     {
@@ -122,6 +128,7 @@ const addDepartment = () => {
     });
 }
 
+// adds new role using user input
 const addRole = async () => {
   const questions = [
     {
@@ -138,7 +145,7 @@ const addRole = async () => {
       type: 'list',
       name: 'department',
       message: 'Which department does this role belong to?',
-      choices: async function() {
+      choices: async function() { // func for grabbing and listing department names
         const depts = await db.promise().query(`SELECT name FROM departments`);
         const departmentNames = depts[0].map((row) => row.name);
         return departmentNames;
@@ -159,6 +166,7 @@ const addRole = async () => {
   })
 }
 
+// adds new employee to database using user input
 const addEmployee = async () => {
   const questions = [
     {
@@ -175,7 +183,7 @@ const addEmployee = async () => {
       type: 'list',
       name: 'role',
       message: "What is the employee's role?",
-      choices: async function() {
+      choices: async function() { // grabs list of roles
         const roles = await db.promise().query(`SELECT title FROM roles`);
         const roleNames = roles[0].map((row) => row.title);
         return roleNames;
@@ -185,14 +193,14 @@ const addEmployee = async () => {
       type: 'list',
       name: 'manager',
       message: "Who is the employee's manager?",
-      choices: async function() {
+      choices: async function() { // grabs all existing employees
         const managers = await db.promise().query(`SELECT * FROM employees`);
         const managerChoices = managers[0].map((row) => ({
           name: `${row.first_name} ${row.last_name}`,
-          value: row.id
+          value: row.id // displays first + last name of employee but actual value to be used is employee id
         }));
         managerChoices.unshift({
-          name: 'None',
+          name: 'None', // simply adds none to list of employee names
           value: null
         });
         return managerChoices;
@@ -213,6 +221,7 @@ const addEmployee = async () => {
   })
 }
 
+// updates employee role
 const updateEmployee = async () => {
   const questions = [
     {
@@ -231,7 +240,7 @@ const updateEmployee = async () => {
     {
       type: 'list',
       name: 'role',
-      message: "Which employee's role do you want to update?",
+      message: "Which role do you want to assign to this employee?",
       choices: async function() {
         const roles = await db.promise().query(`SELECT title FROM roles`);
         const roleNames = roles[0].map((row) => row.title);
@@ -253,6 +262,7 @@ const updateEmployee = async () => {
   })
 }
 
+// helper func to get department id
 const getDepartmentId = async (department) => {
   const query = `SELECT id FROM departments WHERE name = ?`;
   const [rows] = await db.promise().query(query, [department]);
@@ -263,6 +273,7 @@ const getDepartmentId = async (department) => {
   }
 }
 
+// helper func to get role id
 const getRoleId = async (title) => {
   const query = `SELECT id FROM roles WHERE title = ?`;
   const [rows] = await db.promise().query(query, [title]);
@@ -273,4 +284,5 @@ const getRoleId = async (title) => {
   }
 }
 
+// basically init function
 ask();
