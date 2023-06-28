@@ -40,7 +40,7 @@ const ask = () => {
           handleViewRoles();
           break;
         case 'View all employees':
-          console.log('Viewing all employees');
+          handleViewEmployees();
           break;
         case 'Add a department':
           console.log('Adding a department');
@@ -72,6 +72,16 @@ const handleViewDepartments = () => {
 
 const handleViewRoles = () => {
   db.query(`SELECT * FROM roles`, (err, data) => {
+    if (err) {
+      console.log(err);
+    }
+    console.table(data);
+    ask();
+  });
+}
+
+const handleViewEmployees = () => {
+  db.query(`SELECT * FROM employees`, (err, data) => {
     if (err) {
       console.log(err);
     }
