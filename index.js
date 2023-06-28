@@ -34,16 +34,16 @@ const ask = () => {
   .then((data) => {
       switch(data.option) {
         case 'View all departments':
-          handleViewDepartments();
+          viewDepartments();
           break;
         case 'View all roles':
-          handleViewRoles();
+          viewRoles();
           break;
         case 'View all employees':
-          handleViewEmployees();
+          viewEmployees();
           break;
         case 'Add a department':
-          console.log('Adding a department');
+          addDepartment();
           break;
         case 'Add a role':
           console.log('Adding a role');
@@ -60,7 +60,7 @@ const ask = () => {
   });
 }
 
-const handleViewDepartments = () => {
+const viewDepartments = () => {
   db.query(`SELECT * FROM departments`, (err, data) => {
     if (err) {
       console.log(err);
@@ -70,7 +70,7 @@ const handleViewDepartments = () => {
   });
 }
 
-const handleViewRoles = () => {
+const viewRoles = () => {
   db.query(`SELECT * FROM roles`, (err, data) => {
     if (err) {
       console.log(err);
@@ -80,7 +80,7 @@ const handleViewRoles = () => {
   });
 }
 
-const handleViewEmployees = () => {
+const viewEmployees = () => {
   db.query(`SELECT * FROM employees`, (err, data) => {
     if (err) {
       console.log(err);
@@ -88,6 +88,18 @@ const handleViewEmployees = () => {
     console.table(data);
     ask();
   });
+}
+
+const addDepartment = () => {
+  inquirer.prompt('Please name a department to add.')
+    .then((input) => {
+      db.query(`INSERT INTO departments (name) VALUES (?)`, input, (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+        console.table(result);
+      });
+    });
 }
 
 ask();
