@@ -71,7 +71,12 @@ const viewDepartments = () => {
 }
 
 const viewRoles = () => {
-  db.query(`SELECT * FROM roles`, (err, data) => {
+  const query = `
+    SELECT roles.id, roles.title, departments.name, roles.salary
+    FROM roles
+    JOIN departments ON departments.id = roles.department_id
+  `;
+  db.query(query, (err, data) => {
     if (err) {
       console.log(err);
     }
@@ -81,7 +86,14 @@ const viewRoles = () => {
 }
 
 const viewEmployees = () => {
-  db.query(`SELECT * FROM employees`, (err, data) => {
+  const query = `
+  SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name AS department, roles.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager
+  FROM employees
+  JOIN roles ON employees.role_id = roles.id
+  JOIN departments ON roles.department_id = departments.id
+  LEFT JOIN employees AS manager ON employees.manager_id = manager.id
+  `;
+  db.query(query, (err, data) => {
     if (err) {
       console.log(err);
     }
